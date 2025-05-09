@@ -1,3 +1,3 @@
-module pin-v1
+module pin
 
 go 1.24.2
