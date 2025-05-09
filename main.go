@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 )
-func main(){
-	conf_content,err := ioutil.ReadFile("example.conf") 
+const conf_path = "example.conf"
+
+func parse_config() map[string]string {
+	conf_content,err := ioutil.ReadFile(conf_path) 
 	if err != nil {
 		fmt.Println("Unable to open and read configuration file")
 		os.Exit(1)
@@ -23,4 +25,8 @@ func main(){
 			fmt.Printf("Invalid pair %s\n",pair)
 		}
 	}
+	return config
+}
+func main(){
+	config := parse_config()
 }
