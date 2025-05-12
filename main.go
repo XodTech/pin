@@ -5,17 +5,21 @@ import (
 	"strings"
 	"io/ioutil"
 	"os"
+	"regexp"
 )
-const conf_path = "example.conf"
+const config_path = "example.conf"
 const default_filename = ".pin"
+
 func parse_config() map[string]string {
-	conf_content,err := ioutil.ReadFile(conf_path) 
+	config_content_bytes,err := ioutil.ReadFile(config_path) 
 	if err != nil {
 		fmt.Println("Unable to open and read configuration file")
 		os.Exit(1)
 	}
+	re := regexp.MustCompile(`\s+`)
+	config_content := re.ReplaceAllString(string(config_content_bytes),"")
 	config := make(map[string]string)
-	for _,pair := range strings.Split(string(conf_content),`;`){ // TODO: Add function to remove spaces
+	for _,pair := range strings.Split(string(config_content),`;`){
 		kv := strings.Split(pair,`=`)
 		if len(kv) == 2 {
 			config[kv[0]] = kv[1]
@@ -41,4 +45,5 @@ func main(){
 	}else if len(os.Args) == 1 {
 		filename = default_filename
 	}
+	fmt.Println(filename)
 }
