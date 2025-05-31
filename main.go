@@ -7,8 +7,9 @@ import (
 	"os"
 	"regexp"
 )
+
 const config_path = "example.conf"
-const default_filename = ".pin"
+const default_target_filename = ".pin"
 
 func parse_config() map[string]string {
 	config_content_bytes,err := ioutil.ReadFile(config_path) 
@@ -32,18 +33,32 @@ func parse_config() map[string]string {
 	return config
 }
 func main(){	
-	var filename string
+	var target_filename string
 	if len(os.Args) >= 2{
 		config := parse_config()
 		arg := os.Args[1]
 		if config[arg] != "" {
-			filename = config[arg]
+			target_filename = config[arg]
 		}else {
-			filename = default_filename
+			target_filename = default_target_filename
 		}
 
 	}else if len(os.Args) == 1 {
-		filename = default_filename
+		target_filename = default_target_filename
 	}
-	fmt.Println(filename)
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		fmt.Println("Unable to get list of files in the current directory")
+		os.Exit(1)
+	}
+	for _,file := range files {
+		if file.Name() == target_filename{
+			err := ioutil.WriteFile(target_filename,[]byte(os.Args[2]),0644)
+			if err != nil {		
+				fmt.Println("Unable to write to the target file")
+				os.Exit(1)
+			}
+		}
+	}
+
 }
