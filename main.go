@@ -53,11 +53,20 @@ func main(){
 	}
 	for _,file := range files {
 		if file.Name() == target_filename{
-			err := ioutil.WriteFile(target_filename,[]byte(os.Args[2]),0644)
-			if err != nil {		
+			content,err1 := ioutil.ReadFile(target_filename)
+			if err1 != nil {		
+				fmt.Println("Unable to read the target file")
+				os.Exit(1)
+			}else if len(content) >= 1{
+				content = append(content,"\n"...)
+			}
+			content = append(content,[]byte(os.Args[2])...)
+			err2 := ioutil.WriteFile(target_filename,content,0644)
+			if err2 != nil {		
 				fmt.Println("Unable to write to the target file")
 				os.Exit(1)
 			}
+			return
 		}
 	}
 
