@@ -2,48 +2,48 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strings"
 )
 
 const config_path = "example.conf"
 const default_target_filename = ".pin"
 
 func parse_config() map[string]string {
-	config_content_bytes,err := ioutil.ReadFile(config_path) 
+	config_content_bytes, err := ioutil.ReadFile(config_path)
 	if err != nil {
 		fmt.Println("Unable to open and read configuration file")
 		os.Exit(1)
 	}
 	re := regexp.MustCompile(`\s+`)
-	config_content := re.ReplaceAllString(string(config_content_bytes),"")
+	config_content := re.ReplaceAllString(string(config_content_bytes), "")
 	config := make(map[string]string)
-	for _,pair := range strings.Split(string(config_content),`;`){
-		kv := strings.Split(pair,`=`)
+	for _, pair := range strings.Split(string(config_content), `;`) {
+		kv := strings.Split(pair, `=`)
 		if len(kv) == 2 {
 			config[kv[0]] = kv[1]
-		}else if len(kv) == 1{
+		} else if len(kv) == 1 {
 			break
-		}else {
-			fmt.Printf("Invalid pair %s\n",pair)
+		} else {
+			fmt.Printf("Invalid pair %s\n", pair)
 		}
 	}
 	return config
 }
-func main(){	
+func main() {
 	var target_filename string
-	if len(os.Args) >= 2{
+	if len(os.Args) >= 2 {
 		config := parse_config()
-		arg := os.Args[1]
-		if config[arg] != "" {
-			target_filename = config[arg]
-		}else {
+		option := os.Args[1]
+		if config[option] != "" {
+			target_filename = config[option]
+		} else {
 			target_filename = default_target_filename
 		}
 
-	}else if len(os.Args) == 1 {
+	} else if len(os.Args) == 1 {
 		target_filename = default_target_filename
 	}
 	files, err := ioutil.ReadDir(".")
@@ -51,25 +51,25 @@ func main(){
 		fmt.Println("Unable to get list of files in the current directory")
 		os.Exit(1)
 	}
-	for _,file := range files {
-		if file.Name() == target_filename{
-			content,err1 := ioutil.ReadFile(target_filename)
-			if err1 != nil {		
+	for _, file := range files {
+		if file.Name() == target_filename {
+			content, err := ioutil.ReadFile(target_filename)
+			if err != nil {
 				fmt.Println("Unable to read the target file")
 				os.Exit(1)
-			}else if len(content) >= 1{
-				content = append(content,"\n"...)
+			} else if len(content) >= 1 {
+				content = append(content, "\n"...)
 			}
-			content = append(content,[]byte(os.Args[2])...)
-			err2 := ioutil.WriteFile(target_filename,content,0644)
-			if err2 != nil {		
+			content = append(content, []byte(os.Args[2])...)
+			err = ioutil.WriteFile(target_filename, content, 0644)
+			if err != nil {
 				fmt.Println("Unable to write to the target file")
 				os.Exit(1)
 			}
 			return
 		}
 	}
-	err = ioutil.WriteFile(target_filename,[]byte(os.Args[2]),0644)
+	err = ioutil.WriteFile(target_filename, []byte(os.Args[2]), 0644)
 	if err != nil {
 		fmt.Println("Unable to create and write to the target file")
 		os.Exit(1)
