@@ -69,5 +69,9 @@ func main(){
 			return
 		}
 	}
-
+	err = ioutil.WriteFile(target_filename,[]byte(os.Args[2]),0644)
+	if err != nil {
+		fmt.Println("Unable to create and write to the target file")
+		os.Exit(1)
+	}
 }
