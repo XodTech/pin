@@ -4,18 +4,50 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
-const config_path = "example.conf"
+var config_path string
+
 const default_target_filename = ".pin"
 
 func parse_config() map[string]string {
+	os_name := runtime.GOOS
+	if os_name == "windows" {
+		config_path = os.Getenv("USERPROFILE") + "\\.config\\pin\\aliases.conf"
+	} else if os_name == "linux" || os_name == "darwin" || strings.Contains(os_name, "bsd") || os_name == "dragonfly" {
+		config_path = os.Getenv("HOME") + "/.config/pin/aliases.conf"
+	} else {
+		fmt.Println("Your OS might be not supported")
+		os.Exit(1)
+	}
+
 	config_content_bytes, err := ioutil.ReadFile(config_path)
 	if err != nil {
-		fmt.Println("Unable to open and read configuration file")
-		os.Exit(1)
+		if os.IsNotExist(err) {
+			err := os.MkdirAll(filepath.Dir(config_path), 0755)
+			if err != nil {
+				fmt.Println("Falied to create configuration file in ", config_path)
+				fmt.Println("Please make it manually before starting this utility again.")
+				os.Exit(1)
+			}
+			_, err = os.Create(config_path)
+			if err != nil {
+				fmt.Println("Falied to create configuration file in ", config_path)
+				fmt.Println("Please make it manually before starting this utility again.")
+				os.Exit(1)
+			}
+
+			fmt.Println("A new configuration file has been created at:", config_path)
+			fmt.Println("To get started, please add your aliases to this file, following the format described in the GitHub repository:")
+			fmt.Println("https://github.com/XodTech/pin")
+		} else {
+			fmt.Println("Unable to open and read configuration file")
+			os.Exit(1)
+		}
 	}
 	re := regexp.MustCompile(`\s+`)
 	config_content := re.ReplaceAllString(string(config_content_bytes), "")
