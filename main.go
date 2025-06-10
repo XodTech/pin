@@ -17,7 +17,7 @@ const default_target_filename = ".pin"
 func parse_config() map[string]string {
 	os_name := runtime.GOOS
 	if os_name == "windows" {
-		config_path = os.Getenv("USERPROFILE") + "\\.config\\pin\\aliases.conf"
+		config_path = os.Getenv("USERPROFILE") + "\\pin\\aliases.conf"
 	} else if os_name == "linux" || os_name == "darwin" || strings.Contains(os_name, "bsd") || os_name == "dragonfly" {
 		config_path = os.Getenv("HOME") + "/.config/pin/aliases.conf"
 	} else {
